@@ -1,60 +1,185 @@
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
+    id "fabric-loom" version "1.10.+"
+    id "com.gradleup.shadow" version "8.3.6"
+    id "ploceus" version "1.10.+"
+    id "maven-publish"
 }
 
-architectury {
-    minecraft = rootProject.minecraft_version
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
+base {
+    archivesName = rootProject.archives_base_name + "-ornithe"
+}
 
-    loom {
-        silentMojangMappingsLicense()
+version = rootProject.mod_version
+group = rootProject.maven_group
+
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+    maven { url "https://moehreag.duckdns.org/maven/releases" }
+    maven { url "https://maven.neoforged.net/releases/" }
+    maven { url 'https://repo.sleeping.town/' }
+    maven { url 'https://maven.is-quite.gay/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    // The following line declares the mojmap mappings, you may use other mappings as well
+    mappings ploceus.featherMappings(project.feather_build)
+
+    ploceus.dependOsl(project.osl_version)
+
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    implementation("io.netty.incubator:netty-incubator-codec-classes-quic:${rootProject.quic_version}") {
+        exclude(group: "io.netty")
     }
+    implementation 'folk.sisby:kaleido-config:0.3.1+1.3.1'
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        // The following line declares the mojmap mappings, you may use other mappings as well
-        mappings loom.officialMojangMappings()
-        // The following line declares the yarn mappings you may select this one as well.
-        // mappings "net.fabricmc:yarn:1.18.2+build.4:v2"
+    shadowCommon(implementation("io.netty.incubator:netty-incubator-codec-classes-quic:${rootProject.quic_version}") {
+        exclude(group: "io.netty")
+    })
+    include 'folk.sisby:kaleido-config:0.3.1+1.3.1'
+
+    // Dependencies for commands
+    modImplementation("io.github.axolotlclient:AxolotlClient:3.1.3+1.8.9")
+    compileOnly("com.mojang:brigadier:1.0.18")
+    modCompileOnly("io.github.moehreag:legacy-lwjgl3:${project.property("legacy_lwgjl3")}")
+    modLocalRuntime("io.github.moehreag:legacy-lwjgl3:${project.property("legacy_lwgjl3")}:all-remapped")
+
+    // Netty dependencies.. oh well
+    shadowCommon(implementation("io.netty:netty-buffer:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-codec:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-common:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-handler:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-resolver:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-transport:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-transport-classes-epoll:${project.netty_version}"))
+    shadowCommon(implementation("io.netty:netty-transport-native-epoll:${project.netty_version}:linux-x86_64"))
+    shadowCommon(implementation("io.netty:netty-transport-native-epoll:${project.netty_version}:linux-aarch_64"))
+    shadowCommon(implementation("io.netty:netty-transport-native-unix-common:${project.netty_version}"))
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        dependencySubstitution {
+            substitute(module("io.netty:netty-all:4.0.23.Final")).using(module("io.netty:netty-all:${project.netty_version}"))
+        }
+        force("io.netty:netty-all:${project.netty_version}")
+        dependencySubstitution {
+            substitute(module("com.mojang:netty:1.8.8")).using(module("com.mojang:patchy:2.2.10"))
+        }
+        force("com.mojang:patchy:2.2.10")
     }
 }
 
-allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.release = 17
+}
 
-    base {
-        archivesName = rootProject.archives_base_name + "-" + project.name
+java {
+    withSourcesJar()
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            from components.java
+        }
     }
 
-    version = rootProject.mod_version
-    group = rootProject.maven_group
-
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
-        maven { url "https://maven.neoforged.net/releases/" }
-        maven { url 'https://repo.sleeping.town/' }
-        maven { url 'https://maven.is-quite.gay/' }
-    }
-
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-        options.release = 17
-    }
-
-    java {
-        withSourcesJar()
+        // Add repositories to publish to here.
+        /*maven {
+            url "https://sg.storage.bunnycdn.com/skyeven"
+            credentials(HttpHeaderCredentials) {
+                name = "AccessKey"
+                value = property("skyevenToken")
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }*/
     }
 }
+
+/*publishMods {
+    file = remapJar.archiveFile
+    type = STABLE
+    changelog = getLatestChangelog()
+    modLoaders.add("fabric")
+    modLoaders.add("quilt")
+
+    version = project.version + "-fabric"
+    displayName = "[Fabric] $project.version"
+
+    // Uncomment your desired platform(s)
+    curseforge {
+        accessToken = project.curseforgeApiToken
+        projectId = project.curseforgeId
+        minecraftVersions.addAll(
+                "1.18", "1.18.1", "1.18.2",
+                "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
+                "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
+                "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"
+        )
+
+        requires {
+            slug = "fabric-api"
+        }
+    }
+
+    modrinth {
+        accessToken = project.modrinthApiToken
+        projectId = project.modrinthId
+        additionalFiles.from(sourcesJar.archiveFile)
+        minecraftVersions.addAll(
+                "1.18", "1.18.1", "1.18.2",
+                "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
+                "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
+                "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5"
+        )
+
+        requires {
+            slug = "fabric-api"
+        }
+    }
+}*/
 
 ext.getLatestChangelog = {
     Collection<String> lines = file("$rootDir/CHANGELOG.md").readLines()
