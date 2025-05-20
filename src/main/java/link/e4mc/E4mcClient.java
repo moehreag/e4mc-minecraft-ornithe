@@ -12,6 +12,7 @@ public class E4mcClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(E4mcClient.MOD_ID);
 
 	public static void init() {
+		Config.register();
 //        if (System.getProperty("os.name").startsWith("Windows")) {
 //            var path = Agnos.jarPath();
 //            var motwPath = path + ":Zone.Identifier";

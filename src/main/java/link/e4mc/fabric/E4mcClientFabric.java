@@ -9,6 +9,5 @@ public class E4mcClientFabric implements ModInitializer {
     public void onInitialize() {
         E4mcClient.init();
         E4mcClient.registerCommands(ClientCommands.getDISPATCHER());
-        //CommandRegistrationCallback.EVENT.register((dispatcher, ignored) -> E4mcClient.registerCommands(dispatcher));
     }
 }

@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "link.e4mc.fabric.E4mcClientFabric"
+    ],
+    "axolotlclient.module": [
+      "link.e4mc.fabric.E4mcAxolotlClientModule"
     ]
   },
   "mixins": [

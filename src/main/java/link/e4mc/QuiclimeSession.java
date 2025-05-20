@@ -243,10 +243,10 @@ public class QuiclimeSession {
 	}
 
 	private static BrokerResponse getRelay() throws Exception {
-		if (Config.INSTANCE.useBroker.value()) {
+		if (Config.INSTANCE.useBroker.get()) {
 			var httpClient = HttpClient.newHttpClient();
 			var request = HttpRequest
-					.newBuilder(new URI(Config.INSTANCE.brokerUrl.value()))
+					.newBuilder(new URI(Config.INSTANCE.brokerUrl.get()))
 					.header("Accept", "application/json")
 					.build();
 			LOGGER.info("req: {}", request);
@@ -259,8 +259,12 @@ public class QuiclimeSession {
 		} else {
 			var resp = new BrokerResponse();
 			resp.id = "custom";
-			resp.host = Config.INSTANCE.relayHost.value();
-			resp.port = Config.INSTANCE.relayPort.value();
+			resp.host = Config.INSTANCE.relayHost.get();
+			try {
+				resp.port = Integer.parseInt(Config.INSTANCE.relayPort.get());
+			} catch (NumberFormatException e) {
+				resp.port = Integer.parseInt(Config.INSTANCE.relayPort.getDefault());
+			}
 			return resp;
 		}
 	}
