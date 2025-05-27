@@ -7,9 +7,12 @@
   "authors": [
     "skyevg"
   ],
+  "contributors": [
+    "moehreag"
+  ],
   "contact": {
     "homepage": "https://e4mc.link/",
-    "sources": "https://github.com/vgskye/e4mc-minecraft-architectury"
+    "sources": "https://github.com/moehreag/e4mc-minecraft-ornithe"
   },
   "license": "MIT",
   "icon": "assets/e4mc_minecraft/icon.png",
@@ -27,8 +30,5 @@
   },
   "breaks": {
     "nettyfix": "*"
-  },
-  "provides": [
-    "e4mc_minecraft_fabric"
-  ]
+  }
 }
