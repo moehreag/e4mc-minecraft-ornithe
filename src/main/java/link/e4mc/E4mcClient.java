@@ -1,8 +1,10 @@
 package link.e4mc;
 
 import com.mojang.brigadier.CommandDispatcher;
-import io.github.axolotlclient.commands.ClientCommandInfo;
-import io.github.axolotlclient.commands.ClientCommands;
+import link.e4mc.fabric.CommandRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.source.CommandSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,17 +25,17 @@ public class E4mcClient {
 //        }
 	}
 
-	public static void registerCommands(CommandDispatcher<ClientCommandInfo> dispatcher) {
+	public static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
-				ClientCommands.literal("e4mc")
+				CommandRegistry.literal("e4mc")
 						.requires(src -> {
-							if (src.getMinecraft().getServer().isDedicated()) {
-								return src.getMinecraft().player.canUseCommand(4, "e4mc");
+							if (MinecraftServer.getInstance().isDedicated()) {
+								return src.canUseCommand(4, "e4mc");
 							} else {
-								return src.getMinecraft().getServer().getUsername().equals(src.getMinecraft().player.getGameProfile().getName());
+								return src.getName().equals(Minecraft.getInstance().getSession().getUsername());
 							}
 						})
-						.then(ClientCommands.literal("stop").executes(ctx -> {
+						.then(CommandRegistry.literal("stop").executes(ctx -> {
 							if ((session != null) && (session.state != QuiclimeSession.State.STOPPED)) {
 								session.stop();
 								Mirror.sendSuccessToSource(ctx.getSource(), Mirror.translatable("text.e4mc_minecraft.closeServer"));
@@ -42,7 +44,7 @@ public class E4mcClient {
 							}
 							return 1;
 						}))
-						.then(ClientCommands.literal("restart").executes(ctx -> {
+						.then(CommandRegistry.literal("restart").executes(ctx -> {
 							if ((session != null) && (session.state != QuiclimeSession.State.STARTED)) {
 								session.stop();
 								session = new QuiclimeSession();

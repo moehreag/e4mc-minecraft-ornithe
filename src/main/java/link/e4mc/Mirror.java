@@ -2,7 +2,7 @@ package link.e4mc;
 
 import java.util.function.UnaryOperator;
 
-import io.github.axolotlclient.commands.ClientCommandInfo;
+import net.minecraft.server.command.source.CommandSource;
 import net.minecraft.text.*;
 
 public class Mirror {
@@ -36,11 +36,11 @@ public class Mirror {
 		return new TranslatableText(text, args);
 	}
 
-	public static void sendSuccessToSource(ClientCommandInfo source, Text message) {
-		source.sendMessageAsync(message);
+	public static void sendSuccessToSource(CommandSource source, Text message) {
+		source.sendMessage(message);
 	}
 
-	public static void sendFailureToSource(ClientCommandInfo source, Text message) {
-		source.sendMessageAsync(message);
+	public static void sendFailureToSource(CommandSource source, Text message) {
+		source.sendMessage(message);
 	}
 }

@@ -15,21 +15,20 @@
   "icon": "assets/e4mc_minecraft/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "init": [
       "link.e4mc.fabric.E4mcClientFabric"
-    ],
-    "axolotlclient.module": [
-      "link.e4mc.fabric.E4mcAxolotlClientModule"
     ]
   },
   "mixins": [
     "e4mc_minecraft.mixins.json"
   ],
   "depends": {
-    "axolotlclient": "*",
     "minecraft": "<=1.12.2"
   },
   "breaks": {
     "nettyfix": "*"
-  }
+  },
+  "provides": [
+    "e4mc_minecraft_fabric"
+  ]
 }
