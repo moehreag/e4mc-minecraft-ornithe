@@ -1,6 +1,6 @@
 plugins {
-    id "fabric-loom" version "1.10.+"
-    id "ploceus" version "1.10.+"
+    id "fabric-loom" version "1.11.+"
+    id "ploceus" version "1.11.+"
     id "maven-publish"
 }
 
@@ -91,61 +91,9 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
-        /*maven {
-            url "https://sg.storage.bunnycdn.com/skyeven"
-            credentials(HttpHeaderCredentials) {
-                name = "AccessKey"
-                value = property("skyevenToken")
-            }
-            authentication {
-                header(HttpHeaderAuthentication)
-            }
-        }*/
+
     }
 }
-
-/*publishMods {
-    file = remapJar.archiveFile
-    type = STABLE
-    changelog = getLatestChangelog()
-    modLoaders.add("fabric")
-    modLoaders.add("quilt")
-
-    version = project.version + "-fabric"
-    displayName = "[Fabric] $project.version"
-
-    // Uncomment your desired platform(s)
-    curseforge {
-        accessToken = project.curseforgeApiToken
-        projectId = project.curseforgeId
-        minecraftVersions.addAll(
-                "1.18", "1.18.1", "1.18.2",
-                "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
-                "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
-                "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"
-        )
-
-        requires {
-            slug = "fabric-api"
-        }
-    }
-
-    modrinth {
-        accessToken = project.modrinthApiToken
-        projectId = project.modrinthId
-        additionalFiles.from(sourcesJar.archiveFile)
-        minecraftVersions.addAll(
-                "1.18", "1.18.1", "1.18.2",
-                "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4",
-                "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
-                "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5"
-        )
-
-        requires {
-            slug = "fabric-api"
-        }
-    }
-}*/
 
 ext.getLatestChangelog = {
     Collection<String> lines = file("$rootDir/CHANGELOG.md").readLines()

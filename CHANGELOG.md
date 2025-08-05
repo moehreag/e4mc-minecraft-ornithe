@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.4.1
+
+- You can no longer lock yourself out of a world by banning yourself or forgetting to whitelist yourself
+
+## 5.4.0
+
+- Now supports 1.21.6
+- Now restores basic administration commands such as /ban and /whitelist for LAN servers.
+
 ## 5.3.1
 
 - Now supports 1.21.5

@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "BanListCommandsMixin",
+    "BanPlayerCommandsMixin",
     "ConnectionMixin",
     "PacketByteBufMixin",
     "ServerConnectionListenerMixin",
@@ -11,5 +13,8 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "PlayerListMixin"
+  ]
 }
