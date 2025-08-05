@@ -21,6 +21,9 @@ public class Config extends BaseConfig {
 	public StringOption relayHost = new StringOption("e4mc.relay_host", "", "test.e4mc.link");
 	public StringOption relayPort = new StringOption("e4mc.relay_port", "", "25575");
 
+	public BooleanOption restoreDedicatedCommands = new BooleanOption("e4mc.restore_dedicated_commands", "Allows use of certain dedicated server commands such as /ban and /whitelist", true);
+	public BooleanOption useWhiteList = new BooleanOption("e4mc.use_whitelist", "Whether to use whitelists on LAN worlds", false);
+
 	public static void register() {
 		if (INSTANCE == null) {
 			ConfigManager.register(INSTANCE = new Config());
@@ -66,6 +69,6 @@ public class Config extends BaseConfig {
 
 	@Override
 	public void init() {
-		registerOptions("root", useBroker, brokerUrl, relayHost, relayPort);
+		registerOptions("root", useBroker, brokerUrl, relayHost, relayPort, restoreDedicatedCommands, useWhiteList);
 	}
 }

@@ -1,17 +1,24 @@
 package link.e4mc;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import link.e4mc.fabric.CommandRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.handler.CommandManager;
 import net.minecraft.server.command.source.CommandSource;
+import net.minecraft.server.dedicated.command.BanCommand;
+import net.minecraft.server.dedicated.command.BanListCommand;
+import net.minecraft.server.dedicated.command.PardonCommand;
+import net.minecraft.server.dedicated.command.WhitelistCommand;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class E4mcClient {
 	public static final String MOD_ID = "e4mc_minecraft";
 	public static QuiclimeSession session;
-	private static final Logger LOGGER = LoggerFactory.getLogger(E4mcClient.MOD_ID);
+	public static final Logger LOGGER = LoggerFactory.getLogger(E4mcClient.MOD_ID);
 
 	public static void init() {
 		Config.register();
@@ -32,7 +39,8 @@ public class E4mcClient {
 							if (MinecraftServer.getInstance().isDedicated()) {
 								return src.canUseCommand(4, "e4mc");
 							} else {
-								return src.getName().equals(Minecraft.getInstance().getSession().getUsername());
+								return src.asEntity() instanceof ServerPlayerEntity player &&
+										isSingleplayerOwner(player.getGameProfile());
 							}
 						})
 						.then(CommandRegistry.literal("stop").executes(ctx -> {
@@ -53,5 +61,10 @@ public class E4mcClient {
 							return 1;
 						}))
 		);
+	}
+
+	public static boolean isSingleplayerOwner(GameProfile profile) {
+		if (MinecraftServer.getInstance().isDedicated()) return false;
+		return profile.getId().equals(Minecraft.getInstance().getSession().getProfile().getId());
 	}
 }

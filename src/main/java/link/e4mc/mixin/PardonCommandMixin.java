@@ -5,15 +5,15 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import link.e4mc.E4mcClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.source.CommandSource;
-import net.minecraft.server.dedicated.command.BanCommand;
+import net.minecraft.server.dedicated.command.PardonCommand;
 import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(BanCommand.class)
-public class BanPlayerCommandsMixin {
+@Mixin(PardonCommand.class)
+public class PardonCommandMixin {
 	@WrapOperation(method = "canUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/command/AbstractCommand;canUse(Lnet/minecraft/server/command/source/CommandSource;)Z"))
-	private boolean allowOwner(BanCommand instance, CommandSource source, Operation<Boolean> original) {
+	private boolean allowOwner(PardonCommand instance, CommandSource source, Operation<Boolean> original) {
 		if (MinecraftServer.getInstance().asEntity() instanceof ServerPlayerEntity player && E4mcClient.isSingleplayerOwner(player.getGameProfile())) {
 			return true;
 		}

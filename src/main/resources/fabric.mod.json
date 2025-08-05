@@ -30,5 +30,8 @@
   },
   "breaks": {
     "nettyfix": "*"
-  }
+  },
+  "provides": [
+    "e4mc_minecraft-ornithe"
+  ]
 }

@@ -1,27 +1,22 @@
 package link.e4mc.mixin;
 
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.server.commands.BanListCommands;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import link.e4mc.E4mcClient;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.source.CommandSource;
+import net.minecraft.server.dedicated.command.BanListCommand;
+import net.minecraft.server.entity.living.player.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.function.Predicate;
-
-@Mixin(BanListCommands.class)
+@Mixin(BanListCommand.class)
 public class BanListCommandsMixin {
-    @Redirect(method = "register", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/builder/LiteralArgumentBuilder;requires(Ljava/util/function/Predicate;)Lcom/mojang/brigadier/builder/ArgumentBuilder;"))
-    private static ArgumentBuilder<CommandSourceStack, LiteralArgumentBuilder<CommandSourceStack>> allowOwner(LiteralArgumentBuilder<CommandSourceStack> instance, Predicate<CommandSourceStack> predicate) {
-        return instance.requires(src -> {
-            try {
-                if (src.getServer().isSingleplayerOwner(src.getPlayerOrException().getGameProfile()))
-                    return true;
-            } catch (CommandSyntaxException ignored) {
-            }
-            return predicate.test(src);
-        });
-    }
+	@WrapOperation(method = "canUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/command/AbstractCommand;canUse(Lnet/minecraft/server/command/source/CommandSource;)Z"))
+	private boolean allowOwner(BanListCommand instance, CommandSource source, Operation<Boolean> original) {
+		if (MinecraftServer.getInstance().asEntity() instanceof ServerPlayerEntity player && E4mcClient.isSingleplayerOwner(player.getGameProfile())) {
+			return true;
+		}
+		return original.call(instance, source);
+	}
 }

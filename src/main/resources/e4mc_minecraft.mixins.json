@@ -7,9 +7,14 @@
     "BanListCommandsMixin",
     "BanPlayerCommandsMixin",
     "ConnectionMixin",
+    "MinecraftServerMixin",
     "PacketByteBufMixin",
+    "PardonCommandMixin",
     "ServerConnectionListenerMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayNetworkHandlerMixin",
+    "StoredUserEntryAccessor",
+    "StoredUserListAccessor",
+    "WhitelistCommandMixin"
   ],
   "injectors": {
     "defaultRequire": 1
